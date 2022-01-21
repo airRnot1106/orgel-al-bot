@@ -10,4 +10,11 @@ module.exports = {
         'plugin:@typescript-eslint/recommended',
         'prettier',
     ],
+    rules: {
+        'no-empty-function': ['error', { allow: ['constructors'] }],
+        '@typescript-eslint/no-empty-function': [
+            'error',
+            { allow: ['constructors'] },
+        ],
+    },
 };
