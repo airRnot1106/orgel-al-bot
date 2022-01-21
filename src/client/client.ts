@@ -1,7 +1,5 @@
-import dotenv from 'dotenv';
-dotenv.config();
-
 import Discord from 'discord.js';
+import { TokenIssuer } from '../issuer/tokenIssuer';
 
 const intents: Discord.IntentsString[] = [
     'GUILDS',
@@ -13,8 +11,8 @@ const client = new Discord.Client({
     intents: intents,
 });
 
-client.on('ready', () => {
-    console.log('Orgel-Al has woken up');
+client.on('ready', async () => {
+    console.log("Orgel-Al's screw is wound.");
 });
 
-client.login(process.env.DISCORD_BOT_TOKEN);
+client.login(TokenIssuer.instance.tokens.DISCORD_BOT_TOKEN);
