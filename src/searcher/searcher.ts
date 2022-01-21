@@ -2,6 +2,7 @@ import ytdl from 'ytdl-core';
 import { YoutubeDataAPI } from 'youtube-v3-api';
 import { TokenIssuer } from '../issuer/tokenIssuer';
 import { UrlParser } from './urlParser';
+import { VideoState } from '../type/type';
 
 export class Searcher {
     private static _instance: Searcher;
@@ -45,7 +46,7 @@ export class Searcher {
     async searchByUrl(videoUrl: string) {
         const res = await ytdl.getBasicInfo(videoUrl).catch(() => null);
         const status = res ? 200 : 404;
-        return {
+        return <VideoState>{
             status: status,
             detail: '動画が存在しません！',
             video:
@@ -69,7 +70,7 @@ export class Searcher {
             }[];
         };
         const status = res.items.length ? 200 : 404;
-        return {
+        return <VideoState>{
             status: status,
             detail: '動画が存在しません！',
             video:
