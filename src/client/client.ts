@@ -12,7 +12,7 @@ const client = new Discord.Client({
 });
 
 client.on('ready', async () => {
-    console.log("Orgel-Al's screw is wound.");
+    console.log("Orgel-Al's screw is wound...");
 });
 
 client.login(TokenIssuer.instance.tokens.DISCORD_BOT_TOKEN);
