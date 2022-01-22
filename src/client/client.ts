@@ -15,4 +15,8 @@ client.on('ready', async () => {
     console.log("Orgel-Al's screw is wound...");
 });
 
+client.on('messageCreate', (message) => {
+    if (message.author.bot) return;
+});
+
 client.login(TokenIssuer.instance.tokens.DISCORD_BOT_TOKEN);
