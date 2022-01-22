@@ -1,9 +1,9 @@
 import Discord from 'discord.js';
-import { AppResponse, CommandInfo } from '../type/type';
+import { AppResponse, MessageInfo, Commands } from '../type/type';
 
 export class MessageParser {
     private readonly _prefix;
-    private readonly _commands;
+    private readonly _commands: Commands[];
     private _requestedCommand;
     private _args;
     constructor(message: Discord.Message) {
@@ -15,7 +15,7 @@ export class MessageParser {
     execute() {
         const isValidRes = this.validateCommand();
         if (isValidRes.status === 400) return isValidRes;
-        const commandRes = this.switchCommand();
+        const commandRes = this.discernCommand();
         return commandRes;
     }
 
@@ -28,7 +28,7 @@ export class MessageParser {
             };
         if (
             !this._commands.includes(
-                this._requestedCommand.split(this._prefix)[1]
+                this._requestedCommand.split(this._prefix)[1] as Commands
             )
         )
             return <AppResponse<null>>{
@@ -43,32 +43,32 @@ export class MessageParser {
         };
     }
 
-    private switchCommand() {
+    private discernCommand() {
         const command = this._requestedCommand.split(this._prefix)[1];
         switch (command) {
             case 'p': {
-                return <AppResponse<CommandInfo>>{
+                return <AppResponse<MessageInfo>>{
                     status: 200,
                     detail: 'Valid command',
                     body: { command: 'p', args: this._args },
                 };
             }
             case 's': {
-                return <AppResponse<CommandInfo>>{
+                return <AppResponse<MessageInfo>>{
                     status: 200,
                     detail: 'Valid command',
                     body: { command: 's', args: [] },
                 };
             }
             case 'pn': {
-                return <AppResponse<CommandInfo>>{
+                return <AppResponse<MessageInfo>>{
                     status: 200,
                     detail: 'Valid command',
                     body: { command: 'pn', args: [] },
                 };
             }
             case 'pl': {
-                return <AppResponse<CommandInfo>>{
+                return <AppResponse<MessageInfo>>{
                     status: 200,
                     detail: 'Valid command',
                     body: { command: 'pl', args: [] },

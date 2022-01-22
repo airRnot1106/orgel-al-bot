@@ -30,10 +30,10 @@ export class Searcher {
                     ? this._urlParser.convertMobileUrl(q)
                     : q;
                 if (!this._urlParser.isValidUrl(url))
-                    return {
+                    return <AppResponse<null>>{
                         status: 400,
                         detail: 'URLが正しくありません！',
-                        video: null,
+                        body: null,
                     };
                 return await this.searchByUrl(url);
             }
