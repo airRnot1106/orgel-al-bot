@@ -11,13 +11,18 @@ export type Token = {
 };
 
 export type VideoInfo = {
-    title: string;
-    author: string;
-    url: string;
+    readonly title: string;
+    readonly author: string;
+    readonly url: string;
 };
 
-export type VideoState = {
-    status: number;
-    detail: string;
-    video: VideoInfo | null;
+export type CommandInfo = {
+    readonly command: string;
+    readonly args: string[];
+};
+
+export type AppResponse<T> = {
+    readonly status: number;
+    readonly detail: string;
+    readonly body: T | null;
 };
