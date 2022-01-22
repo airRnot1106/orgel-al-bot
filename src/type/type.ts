@@ -18,8 +18,8 @@ export type VideoInfo = {
     readonly url: string;
 };
 
-export type CommandInfo = {
-    readonly command: string;
+export type MessageInfo = {
+    readonly command: Commands;
     readonly args: string[];
 };
 
