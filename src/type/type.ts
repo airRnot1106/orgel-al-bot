@@ -23,6 +23,11 @@ export type MessageInfo = {
     readonly args: string[];
 };
 
+export type CommandInfo = {
+    readonly isReply: boolean;
+    readonly message: string;
+};
+
 export type AppResponse<T> = {
     readonly status: number;
     readonly detail: string;
