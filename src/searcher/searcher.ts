@@ -76,6 +76,7 @@ export class Searcher {
             body:
                 status === 200
                     ? {
+                          id: res.items[0].id.videoId,
                           title: res.items[0].snippet.title,
                           author: res.items[0].snippet.channelTitle,
                           url: `https://www.youtube.com/watch?v=${res.items[0].id.videoId}`,
