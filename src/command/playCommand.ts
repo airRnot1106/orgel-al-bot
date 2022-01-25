@@ -1,3 +1,4 @@
+import Discord from 'discord.js';
 import { Searcher } from '../searcher/searcher';
 import { AppResponse, CommandInfo } from '../type/type';
 import { AbsCommand } from './absCommand';
@@ -5,6 +6,8 @@ import { AbsCommand } from './absCommand';
 export class PlayCommand extends AbsCommand {
     constructor(args: string[]) {
         super(args);
+    constructor(executorMessage: Discord.Message, args: string[]) {
+        super(executorMessage, args);
     }
 
     async execute(): Promise<AppResponse<CommandInfo>> {
