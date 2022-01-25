@@ -46,6 +46,7 @@ client.on('messageCreate', async (message) => {
     if (parseRes.status === 400 || !parseRes.body) return;
     const command = CommandFactory.create(
         parseRes.body.command,
+        message,
         parseRes.body.args
     );
     const commandRes = await command.execute();
