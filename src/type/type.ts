@@ -24,6 +24,24 @@ export type MessageInfo = {
     readonly args: string[];
 };
 
+export type GuildInfo = {
+    readonly guildId: string;
+    readonly guildName: string;
+    readonly ownerId: string;
+    readonly ownerName: string;
+};
+
+export type RequestInfo = {
+    readonly guildId: string;
+    readonly videoId: string;
+    readonly requesterId: string;
+};
+
+export type RequesterInfo = {
+    readonly requesterId: string;
+    readonly requesterName: string;
+};
+
 export type CommandInfo = {
     readonly isReply: boolean;
     readonly message: string;
