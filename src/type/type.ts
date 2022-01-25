@@ -13,6 +13,7 @@ export type Token = {
 export type Commands = 'p' | 's' | 'pn' | 'pl';
 
 export type VideoInfo = {
+    readonly id: string;
     readonly title: string;
     readonly author: string;
     readonly url: string;
