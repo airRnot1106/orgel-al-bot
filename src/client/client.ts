@@ -3,6 +3,7 @@ import { CommandFactory } from '../command/commandFactory';
 import { Register } from '../database/register';
 import { TokenIssuer } from '../issuer/tokenIssuer';
 import { MessageParser } from '../parser/messageParser';
+import { PlayerFactory } from '../player/playerFactory';
 import { GuildInfo } from '../type/type';
 
 const intents: Discord.IntentsString[] = [
@@ -56,6 +57,15 @@ client.on('messageCreate', async (message) => {
     } else if (commandRes.body) {
         await message.channel.send(commandRes.body?.message);
     }
+});
+
+client.on('voiceStateUpdate', async (oldState, newState) => {
+    const myId = newState.guild.me?.id;
+    const stateId = newState.member?.id;
+    if (!myId || !stateId) return;
+    if (!(oldState.channel && !newState.channel)) return;
+    const player = PlayerFactory.instance.getPlayer(newState.guild);
+    player.disconnect();
 });
 
 client.login(TokenIssuer.instance.tokens.DISCORD_BOT_TOKEN);
