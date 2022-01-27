@@ -64,7 +64,7 @@ export class MessageParser {
                 return <AppResponse<MessageInfo>>{
                     status: 200,
                     detail: 'Valid command',
-                    body: { command: 'pn', args: [] },
+                    body: { command: 'pn', args: this._args },
                 };
             }
             case 'pl': {
