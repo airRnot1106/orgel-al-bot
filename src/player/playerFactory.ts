@@ -3,7 +3,7 @@ import { Player } from './player';
 
 export class PlayerFactory {
     private static _instance: PlayerFactory;
-    private _map: Map<Discord.Guild, Player>;
+    private _map: Map<string, Player>;
     private constructor() {
         this._map = new Map();
     }
@@ -16,10 +16,10 @@ export class PlayerFactory {
     }
 
     getPlayer(guild: Discord.Guild) {
-        if (!this._map.has(guild)) {
-            this._map.set(guild, new Player(guild));
+        if (!this._map.has(guild.id)) {
+            this._map.set(guild.id, new Player(guild));
         }
-        const player = this._map.get(guild);
+        const player = this._map.get(guild.id);
         if (!player) throw new Error('Fatal Error');
         return player;
     }
