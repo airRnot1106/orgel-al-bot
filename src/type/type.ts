@@ -35,6 +35,7 @@ export type RequestInfo = {
     readonly guildId: string;
     readonly videoId: string;
     readonly requesterId: string;
+    readonly textChannelId: string;
 };
 
 export type RequesterInfo = {
