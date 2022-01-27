@@ -108,7 +108,7 @@ export abstract class AbsPlayCommand extends AbsCommand {
     async execute(): Promise<AppResponse<CommandInfo>> {
         const beforeRes = await this.before();
         const { status, body } = beforeRes;
-        if (status === 400 || status === 404)
+        if (status === 400 || status === 404 || !body)
             return beforeRes as AppResponse<CommandInfo>;
         const { videoInfo, requestInfo } = body as VideoInfoRequestInfo;
         await this.process(requestInfo);
