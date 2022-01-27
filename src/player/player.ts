@@ -1,6 +1,7 @@
 import Discord from 'discord.js';
 import {
     entersState,
+    AudioPlayer,
     AudioPlayerStatus,
     createAudioPlayer,
     createAudioResource,
@@ -15,11 +16,14 @@ import ytdl from 'ytdl-core';
 
 export class Player {
     private _guild;
-    private _connection: VoiceConnection | undefined;
+    private _connection: VoiceConnection | null;
+    private _player: AudioPlayer | null;
     private _isPlaying;
     private _database;
     constructor(guild: Discord.Guild) {
         this._guild = guild;
+        this._connection = null;
+        this._player = null;
         this._isPlaying = false;
         this._database = Database.instance;
     }
@@ -64,8 +68,8 @@ export class Player {
     async play() {
         if (!this._connection) return;
         const guildId = this._guild.id;
-        const player = createAudioPlayer();
-        this._connection.subscribe(player);
+        this._player = createAudioPlayer();
+        this._connection.subscribe(this._player);
         const existsPlaylist = <boolean>(
             (
                 await this._database.query(
@@ -75,7 +79,7 @@ export class Player {
         );
         if (!existsPlaylist) {
             this._connection.destroy();
-            this._connection = undefined;
+            this._connection = null;
             this._isPlaying = false;
             return;
         }
@@ -110,11 +114,22 @@ export class Player {
             await this._guild.channels.fetch(textChannelId)
         );
         if (textChannel) textChannel.send(message);
-        player.play(resource);
-        await entersState(player, AudioPlayerStatus.Playing, 10 * 1000);
-        await entersState(player, AudioPlayerStatus.Idle, 24 * 60 * 60 * 1000);
+        this._player.play(resource);
+        await entersState(this._player, AudioPlayerStatus.Playing, 10 * 1000);
+        await entersState(
+            this._player,
+            AudioPlayerStatus.Idle,
+            24 * 60 * 60 * 1000
+        );
+        await this.prepareNext();
+    }
+
+    async prepareNext() {
+        if (!this._player) return;
+        if (this._player.state.status === AudioPlayerStatus.Playing)
+            this._player.stop();
         await this._database.query(
-            `DELETE FROM requests WHERE guild_id = '${guildId}' AND index = 0`
+            `DELETE FROM requests WHERE guild_id = '${this._guild.id}' AND index = 0`
         );
         await this.play();
     }
