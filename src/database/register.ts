@@ -76,6 +76,19 @@ export class Register {
         );
     }
 
+    async registerInterruptionRequest(request: RequestInfo) {
+        const { guildId, videoId, requesterId, textChannelId } = request;
+        await this._database.query(
+            `UPDATE requests SET index = index + 1 WHERE guild_id = '${guildId}' AND index > 0`
+        );
+        await this._database.query(
+            `INSERT INTO requests (guild_id, video_id, index, requester_id, text_channel_id) VALUES ('${guildId}', '${videoId}', 1, '${requesterId}', '${textChannelId}')`
+        );
+        await this._database.query(
+            `UPDATE guilds SET request_times = request_times + 1 WHERE guild_id = '${guildId}'`
+        );
+    }
+
     async registerRequester(requester: RequesterInfo) {
         const { requesterId, requesterName } = requester;
         const isExists = (
