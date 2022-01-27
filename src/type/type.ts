@@ -48,6 +48,37 @@ export type CommandInfo = {
     readonly message: string;
 };
 
+export type VideoTable = {
+    video_id: string;
+    title: string;
+    author: string;
+    url: string;
+    requested_times: number;
+};
+
+export type GuildTable = {
+    guild_id: string;
+    guild_name: string;
+    owner_id: string;
+    owner_name: string;
+    request_times: number;
+};
+
+export type RequesterTable = {
+    requester_id: string;
+    requester_name: string;
+    request_times: number;
+};
+
+export type RequestTable = {
+    request_id: string;
+    guild_id: string;
+    video_id: string;
+    index: number;
+    requester_id: string;
+    text_channel_id: string;
+};
+
 export type AppResponse<T> = {
     readonly status: number;
     readonly detail: string;
