@@ -15,6 +15,18 @@ export class SkipCommand extends AbsCommand {
                 detail: 'Not a valid guild',
                 body: { isReply: false, message: '無効なサーバーです！' },
             };
+        const voiceChannel = <Discord.VoiceChannel | null>(
+            this._executorMessage.member?.voice.channel
+        );
+        if (!voiceChannel)
+            return <AppResponse<CommandInfo>>{
+                status: 400,
+                detail: 'Not a valid voice channel',
+                body: {
+                    isReply: true,
+                    message: '先にボイスチャンネルに入ってください！',
+                },
+            };
         const player = PlayerFactory.instance.getPlayer(
             this._executorMessage.guild
         );
