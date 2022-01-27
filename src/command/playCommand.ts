@@ -34,6 +34,17 @@ export class PlayCommand extends AbsCommand {
                     message: '先にボイスチャンネルに入ってください！',
                 },
             };
+        const player = PlayerFactory.instance.getPlayer(
+            this._executorMessage.guild
+        );
+        if (!this._args.length) {
+            player.wind(voiceChannel);
+            return <AppResponse<CommandInfo>>{
+                status: 200,
+                detail: 'Successful winding',
+                body: null,
+            };
+        }
         const searcher = Searcher.instance;
         const searchRes = await searcher.execute(this._args.join(' '));
         if (
@@ -66,9 +77,6 @@ export class PlayCommand extends AbsCommand {
             textChannelId: this._executorMessage.channel.id,
         };
         await this._register.registerRequest(requestInfo);
-        const player = PlayerFactory.instance.getPlayer(
-            this._executorMessage.guild
-        );
         player.wind(voiceChannel);
         return <AppResponse<CommandInfo>>{
             status: 200,
