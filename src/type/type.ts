@@ -48,6 +48,11 @@ export type CommandInfo = {
     readonly message: string;
 };
 
+export type VideoInfoRequestInfo = {
+    readonly videoInfo: VideoInfo;
+    readonly requestInfo: RequestInfo;
+};
+
 export type VideoTable = {
     video_id: string;
     title: string;
