@@ -8,6 +8,7 @@ import {
     RequestInfo,
 } from '../type/type';
 import { AbsCommand } from './absCommand';
+import { PlayerFactory } from '../player/playerFactory';
 
 export class PlayCommand extends AbsCommand {
     constructor(executorMessage: Discord.Message, args: string[]) {
@@ -20,6 +21,18 @@ export class PlayCommand extends AbsCommand {
                 status: 400,
                 detail: 'Not a valid guild',
                 body: { isReply: false, message: '無効なサーバーです！' },
+            };
+        const voiceChannel = <Discord.VoiceChannel>(
+            this._executorMessage.member?.voice.channel
+        );
+        if (!voiceChannel)
+            return <AppResponse<CommandInfo>>{
+                status: 400,
+                detail: 'Not a valid voice channel',
+                body: {
+                    isReply: true,
+                    message: '先にボイスチャンネルに入ってください！',
+                },
             };
         const searcher = Searcher.instance;
         const searchRes = await searcher.execute(this._args.join(' '));
@@ -50,8 +63,13 @@ export class PlayCommand extends AbsCommand {
             guildId: this._executorMessage.guild.id,
             videoId: id,
             requesterId: this._executorMessage.author.id,
+            textChannelId: this._executorMessage.channel.id,
         };
         await this._register.registerRequest(requestInfo);
+        const player = PlayerFactory.instance.getPlayer(
+            this._executorMessage.guild
+        );
+        player.wind(voiceChannel);
         return <AppResponse<CommandInfo>>{
             status: 200,
             detail: 'Successful request',
