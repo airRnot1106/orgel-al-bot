@@ -113,7 +113,6 @@ export class Player {
         player.play(resource);
         await entersState(player, AudioPlayerStatus.Playing, 10 * 1000);
         await entersState(player, AudioPlayerStatus.Idle, 24 * 60 * 60 * 1000);
-        console.log('aabb');
         await this._database.query(
             `DELETE FROM requests WHERE guild_id = '${guildId}' AND index = 0`
         );
