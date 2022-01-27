@@ -38,7 +38,7 @@ export class Searcher {
                 return await this.searchByUrl(url);
             }
             case 'keyword': {
-                return this.searchByKeyword(q);
+                return await this.searchByKeyword(q);
             }
         }
     }
@@ -52,6 +52,7 @@ export class Searcher {
             body:
                 status === 200
                     ? {
+                          id: res?.videoDetails.videoId,
                           title: res?.videoDetails.title,
                           author: res?.videoDetails.author.name,
                           url: videoUrl,
