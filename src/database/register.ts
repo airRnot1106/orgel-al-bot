@@ -59,7 +59,7 @@ export class Register {
     }
 
     async registerRequest(request: RequestInfo) {
-        const { guildId, videoId, requesterId } = request;
+        const { guildId, videoId, requesterId, textChannelId } = request;
         const tail = <number | null>(
             (
                 await this._database.query(
@@ -69,7 +69,10 @@ export class Register {
         );
         const index = tail ? tail + 1 : 1;
         await this._database.query(
-            `INSERT INTO requests (guild_id, video_id, index, requester_id) VALUES ('${guildId}', '${videoId}', ${index}, '${requesterId}')`
+            `INSERT INTO requests (guild_id, video_id, index, requester_id, text_channel_id) VALUES ('${guildId}', '${videoId}', ${index}, '${requesterId}', '${textChannelId}')`
+        );
+        await this._database.query(
+            `UPDATE guilds SET request_times = request_times + 1 WHERE guild_id = '${guildId}'`
         );
     }
 
