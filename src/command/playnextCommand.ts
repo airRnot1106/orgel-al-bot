@@ -1,17 +1,13 @@
 import Discord from 'discord.js';
-import { AppResponse, CommandInfo } from '../type/type';
-import { AbsCommand } from './absCommand';
+import { RequestInfo } from '../type/type';
+import { AbsPlayCommand } from './absPlayCommand';
 
-export class PlaynextCommand extends AbsCommand {
+export class PlaynextCommand extends AbsPlayCommand {
     constructor(executorMessage: Discord.Message, args: string[]) {
         super(executorMessage, args);
     }
 
-    execute(): AppResponse<CommandInfo> {
-        return {
-            status: 200,
-            detail: '',
-            body: { isReply: false, message: 'test' },
-        };
+    protected async process(requestInfo: RequestInfo) {
+        await this._register.registerInterruptionRequest(requestInfo);
     }
 }
