@@ -10,7 +10,7 @@ export type Token = {
     readonly DB_URL: string;
 };
 
-export type Commands = 'p' | 's' | 'pn' | 'pl' | 'h';
+export type Commands = 'p' | 's' | 'pn' | 'pl' | 'h' | 'pf';
 
 export type VideoInfo = {
     readonly id: string;
@@ -73,6 +73,7 @@ export type GuildTable = {
     owner_id: string;
     owner_name: string;
     request_times: number;
+    prefix: string;
 };
 
 export type RequesterTable = {

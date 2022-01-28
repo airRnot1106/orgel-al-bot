@@ -5,6 +5,7 @@ import { HistoryCommand } from './historyCommand';
 import { PlayCommand } from './playCommand';
 import { PlaylistCommand } from './playlistCommand';
 import { PlaynextCommand } from './playnextCommand';
+import { PrefixCommand } from './prefixCommand';
 import { SkipCommand } from './skipCommand';
 
 export class CommandFactory {
@@ -32,6 +33,8 @@ export class CommandFactory {
                 return new PlaylistCommand(executor, args);
             case 'h':
                 return new HistoryCommand(executor, args);
+            case 'pf':
+                return new PrefixCommand(executor, args);
             default:
                 throw new Error('Fatal Error');
         }

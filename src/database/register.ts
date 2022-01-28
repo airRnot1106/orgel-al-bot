@@ -44,6 +44,12 @@ export class Register {
         );
     }
 
+    async registerPrefix(guildId: string, prefix: string) {
+        await this._database.query(
+            `UPDATE guilds SET prefix = '${prefix}' WHERE guild_id = '${guildId}'`
+        );
+    }
+
     async registerVideo(video: VideoInfo) {
         const { id, title, author, url } = video;
         const isExists = <boolean>(
@@ -116,11 +122,13 @@ export class Register {
 
     async registerRequester(requester: RequesterInfo) {
         const { requesterId, requesterName } = requester;
-        const isExists = (
-            await this._database.query(
-                `SELECT EXISTS (SELECT * FROM requesters WHERE requester_id = '${requesterId}')`
-            )
-        ).rows[0].exists;
+        const isExists = <boolean>(
+            (
+                await this._database.query(
+                    `SELECT EXISTS (SELECT * FROM requesters WHERE requester_id = '${requesterId}')`
+                )
+            ).rows[0].exists
+        );
         if (isExists) {
             await this._database.query(
                 `UPDATE requesters SET request_times = request_times + 1 WHERE requester_id = '${requesterId}'`
@@ -136,5 +144,16 @@ export class Register {
         await this._database.query(
             `INSERT INTO histories (guild_id, video_id, requester_id) VALUES ('${history.guildId}', '${history.videoId}', '${history.requesterId}')`
         );
+    }
+
+    async isValidGuild(guildId: string) {
+        const isValid = <boolean>(
+            (
+                await this._database.query(
+                    `SELECT EXISTS (SELECT * FROM guilds WHERE guild_id = '${guildId}')`
+                )
+            ).rows[0].exists
+        );
+        return isValid;
     }
 }
