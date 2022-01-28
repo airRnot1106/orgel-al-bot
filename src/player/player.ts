@@ -11,20 +11,23 @@ import {
     VoiceConnection,
 } from '@discordjs/voice';
 import { Database } from '../database/database';
-import { RequestTable, VideoTable } from '../type/type';
+import { HistoryInfo, RequestTable, VideoTable } from '../type/type';
 import ytdl from 'ytdl-core';
+import { Register } from '../database/register';
 
 export class Player {
     private _guild;
     private _connection: VoiceConnection | null;
     private _player: AudioPlayer | null;
     private _isPlaying;
+    private _register;
     private _database;
     constructor(guild: Discord.Guild) {
         this._guild = guild;
         this._connection = null;
         this._player = null;
         this._isPlaying = false;
+        this._register = Register.instance;
         this._database = Database.instance;
     }
 
@@ -98,7 +101,15 @@ export class Player {
             author,
             url,
             text_channel_id: textChannelId,
+            video_id: videoId,
+            requester_id: requesterId,
         } = tRequestVideo;
+        const historyInfo: HistoryInfo = {
+            guildId: guildId,
+            videoId: videoId,
+            requesterId: requesterId,
+        };
+        await this._register.registerHistory(historyInfo);
         if (!ytdl.validateURL(url)) return;
         const stream = ytdl(url, {
             filter: (format) =>

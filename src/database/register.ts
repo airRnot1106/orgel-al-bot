@@ -1,4 +1,10 @@
-import { GuildInfo, RequesterInfo, VideoInfo, RequestInfo } from '../type/type';
+import {
+    GuildInfo,
+    RequesterInfo,
+    VideoInfo,
+    RequestInfo,
+    HistoryInfo,
+} from '../type/type';
 import { Database } from './database';
 
 export class Register {
@@ -58,6 +64,25 @@ export class Register {
         }
     }
 
+    async registerGuildVideo(guildId: string, videoId: string) {
+        const isExists = <boolean>(
+            (
+                await this._database.query(
+                    `SELECT EXISTS (SELECT * FROM guilds_videos WHERE guild_id = '${guildId}' AND video_id = '${videoId}')`
+                )
+            ).rows[0].exists
+        );
+        if (isExists) {
+            await this._database.query(
+                `UPDATE guilds_videos SET requested_times = requested_times + 1 WHERE guild_id = '${guildId}' AND video_id = '${videoId}'`
+            );
+        } else {
+            await this._database.query(
+                `INSERT INTO guilds_videos (guild_id, video_id) VALUES ('${guildId}', '${videoId}')`
+            );
+        }
+    }
+
     async registerRequest(request: RequestInfo) {
         const { guildId, videoId, requesterId, textChannelId } = request;
         const tail = <number | null>(
@@ -105,5 +130,11 @@ export class Register {
                 `INSERT INTO requesters (requester_id, requester_name) VALUES ('${requesterId}', '${requesterName}')`
             );
         }
+    }
+
+    async registerHistory(history: HistoryInfo) {
+        await this._database.query(
+            `INSERT INTO histories (guild_id, video_id, requester_id) VALUES ('${history.guildId}', '${history.videoId}', '${history.requesterId}')`
+        );
     }
 }
