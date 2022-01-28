@@ -73,6 +73,7 @@ export type GuildTable = {
     owner_id: string;
     owner_name: string;
     request_times: number;
+    prefix: string;
 };
 
 export type RequesterTable = {
