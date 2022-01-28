@@ -1,1 +1,1 @@
-worker: node dist/sever/sever.js
+worker: node dist/server/server.js
