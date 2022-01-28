@@ -1,4 +1,5 @@
 import Discord from 'discord.js';
+import { PlayerFactory } from '../player/playerFactory';
 import {
     AppResponse,
     CommandInfo,
@@ -14,13 +15,21 @@ export class PlaylistCommand extends AbsCommand {
     }
 
     async execute(): Promise<AppResponse<CommandInfo>> {
-        const guildId = this._executorMessage.guild?.id;
-        if (!guildId)
+        const guild = this._executorMessage.guild;
+        if (!guild)
             return <AppResponse<CommandInfo>>{
                 status: 400,
                 detail: 'Not a valid guild',
                 body: { isReply: false, message: '無効なサーバーです！' },
             };
+        const player = PlayerFactory.instance.getPlayer(guild);
+        if (!player.isPlaying)
+            return <AppResponse<CommandInfo>>{
+                status: 400,
+                detail: 'Not a valid voice channel',
+                body: { isReply: true, message: '現在再生停止中です...' },
+            };
+        const guildId = guild?.id;
         const requestList = <(RequestTable & VideoTable & RequesterTable)[]>(
             (
                 await this._database.query(
