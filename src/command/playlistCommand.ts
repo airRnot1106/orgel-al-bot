@@ -29,7 +29,7 @@ export class PlaylistCommand extends AbsCommand {
                 detail: 'Not a valid voice channel',
                 body: { isReply: true, message: '現在再生停止中です...' },
             };
-        const guildId = guild?.id;
+        const guildId = guild.id;
         const requestList = <(RequestTable & VideoTable & RequesterTable)[]>(
             (
                 await this._database.query(
