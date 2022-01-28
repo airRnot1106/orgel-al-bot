@@ -45,7 +45,8 @@ export class PlaylistCommand extends AbsCommand {
             } else {
                 playlistStr += `${index}: ${title}, Upload by: ${author}, Requested by: ${requester_name}\n`;
             }
-            if (playlistStr.length > 1950) {
+            const LENGTH_LIMIT = 1950;
+            if (playlistStr.length > LENGTH_LIMIT) {
                 playlistStr += '\nAnd more...\n';
                 return true;
             }
