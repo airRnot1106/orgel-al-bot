@@ -1,4 +1,10 @@
-import { GuildInfo, RequesterInfo, VideoInfo, RequestInfo } from '../type/type';
+import {
+    GuildInfo,
+    RequesterInfo,
+    VideoInfo,
+    RequestInfo,
+    HistoryInfo,
+} from '../type/type';
 import { Database } from './database';
 
 export class Register {
@@ -124,5 +130,11 @@ export class Register {
                 `INSERT INTO requesters (requester_id, requester_name) VALUES ('${requesterId}', '${requesterName}')`
             );
         }
+    }
+
+    async registerHistory(history: HistoryInfo) {
+        await this._database.query(
+            `INSERT INTO histories (guild_id, video_id, requester_id) VALUES ('${history.guildId}', '${history.videoId}', '${history.requesterId}')`
+        );
     }
 }
