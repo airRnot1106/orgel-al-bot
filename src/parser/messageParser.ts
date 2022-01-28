@@ -8,7 +8,7 @@ export class MessageParser {
     private _args;
     constructor(message: Discord.Message) {
         this._prefix = '!!';
-        this._commands = ['p', 's', 'pn', 'pl'];
+        this._commands = ['p', 's', 'pn', 'pl', 'h'];
         [this._requestedCommand, ...this._args] = message.content.split(' ');
     }
 
@@ -72,6 +72,13 @@ export class MessageParser {
                     status: 200,
                     detail: 'Valid command',
                     body: { command: 'pl', args: [] },
+                };
+            }
+            case 'h': {
+                return <AppResponse<MessageInfo>>{
+                    status: 200,
+                    detail: 'Valid command',
+                    body: { command: 'h', args: this._args },
                 };
             }
             default:

@@ -1,6 +1,7 @@
 import Discord from 'discord.js';
 import { Commands } from '../type/type';
 import { AbsCommand } from './absCommand';
+import { HistoryCommand } from './historyCommand';
 import { PlayCommand } from './playCommand';
 import { PlaylistCommand } from './playlistCommand';
 import { PlaynextCommand } from './playnextCommand';
@@ -29,6 +30,8 @@ export class CommandFactory {
                 return new PlaynextCommand(executor, args);
             case 'pl':
                 return new PlaylistCommand(executor, args);
+            case 'h':
+                return new HistoryCommand(executor, args);
             default:
                 throw new Error('Fatal Error');
         }
