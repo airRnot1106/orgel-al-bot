@@ -44,6 +44,12 @@ export class Register {
         );
     }
 
+    async registerPrefix(guildId: string, prefix: string) {
+        await this._database.query(
+            `UPDATE guilds SET prefix = '${prefix}' WHERE guild_id = '${guildId}'`
+        );
+    }
+
     async registerVideo(video: VideoInfo) {
         const { id, title, author, url } = video;
         const isExists = <boolean>(
