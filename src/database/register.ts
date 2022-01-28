@@ -116,11 +116,13 @@ export class Register {
 
     async registerRequester(requester: RequesterInfo) {
         const { requesterId, requesterName } = requester;
-        const isExists = (
-            await this._database.query(
-                `SELECT EXISTS (SELECT * FROM requesters WHERE requester_id = '${requesterId}')`
-            )
-        ).rows[0].exists;
+        const isExists = <boolean>(
+            (
+                await this._database.query(
+                    `SELECT EXISTS (SELECT * FROM requesters WHERE requester_id = '${requesterId}')`
+                )
+            ).rows[0].exists
+        );
         if (isExists) {
             await this._database.query(
                 `UPDATE requesters SET request_times = request_times + 1 WHERE requester_id = '${requesterId}'`
