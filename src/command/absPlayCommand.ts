@@ -78,6 +78,10 @@ export abstract class AbsPlayCommand extends AbsCommand {
             requesterId: this._executorMessage.author.id,
             textChannelId: this._executorMessage.channel.id,
         };
+        await this._register.registerGuildVideo(
+            this._executorMessage.guild.id,
+            id
+        );
         return <AppResponse<VideoInfoRequestInfo>>{
             status: 200,
             detail: '',
