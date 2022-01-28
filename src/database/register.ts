@@ -139,4 +139,15 @@ export class Register {
             `INSERT INTO histories (guild_id, video_id, requester_id) VALUES ('${history.guildId}', '${history.videoId}', '${history.requesterId}')`
         );
     }
+
+    async isValidGuild(guildId: string) {
+        const isValid = <boolean>(
+            (
+                await this._database.query(
+                    `SELECT EXISTS (SELECT * FROM guilds WHERE guild_id = '${guildId}')`
+                )
+            ).rows[0].exists
+        );
+        return isValid;
+    }
 }
