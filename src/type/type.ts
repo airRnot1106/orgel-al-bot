@@ -53,6 +53,12 @@ export type VideoInfoRequestInfo = {
     readonly requestInfo: RequestInfo;
 };
 
+export type HistoryInfo = {
+    readonly guildId: string;
+    readonly videoId: string;
+    readonly requesterId: string;
+};
+
 export type VideoTable = {
     video_id: string;
     title: string;
@@ -82,6 +88,12 @@ export type RequestTable = {
     index: number;
     requester_id: string;
     text_channel_id: string;
+};
+
+export type HistoryTable = {
+    readonly guild_id: string;
+    readonly video_id: string;
+    readonly requester_id: string;
 };
 
 export type AppResponse<T> = {
