@@ -44,6 +44,10 @@ client.on('guildCreate', async (guild) => {
         ownerName: ownerName,
     };
     await register.registerGuild(guildInfo);
+    const BOT_NAME = TokenIssuer.instance.tokens.APP_ENV
+        ? 'Orgel-Al'
+        : 'Orgel-Al-dev';
+    await guild.me?.setNickname(`[!!]${BOT_NAME}`);
 });
 
 client.on('guildDelete', async (guild) => {
