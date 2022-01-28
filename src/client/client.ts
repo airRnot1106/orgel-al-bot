@@ -43,7 +43,7 @@ client.on('guildDelete', async (guild) => {
 client.on('messageCreate', async (message) => {
     if (message.author.bot) return;
     const messageParser = new MessageParser(message);
-    const parseRes = messageParser.execute();
+    const parseRes = await messageParser.execute();
     if (parseRes.status === 400 || !parseRes.body) return;
     const command = CommandFactory.create(
         parseRes.body.command,
