@@ -21,6 +21,18 @@ client.on('ready', async () => {
 });
 
 client.on('guildCreate', async (guild) => {
+    const hasPermission = guild?.me?.permissions.has('CHANGE_NICKNAME');
+    if (!hasPermission) {
+        const channel = guild.channels.cache;
+        const textChannel = channel.find(
+            (channel) => channel.type === 'GUILD_TEXT'
+        ) as Discord.TextChannel | undefined;
+        if (!textChannel) return;
+        textChannel.send(
+            'パーミッションが付与されていません！\nOrgel-Alを一度追放してもう一度サーバに追加し直してください'
+        );
+        return;
+    }
     const register = Register.instance;
     const { id: guildId, name: guildName } = guild;
     const owner = (await guild.fetchOwner()).user;
@@ -41,10 +53,18 @@ client.on('guildDelete', async (guild) => {
 });
 
 client.on('messageCreate', async (message) => {
+    if (!message.guild?.id) return;
     if (message.author.bot) return;
     const messageParser = new MessageParser(message);
     const parseRes = await messageParser.execute();
     if (parseRes.status === 400 || !parseRes.body) return;
+    const register = Register.instance;
+    if (!(await register.isValidGuild(message.guild?.id))) {
+        message.channel.send(
+            ':no_entry_sign: エラー！ :no_entry_sign:\nサーバ情報が正しく登録されていません！\nOrgel-Alを一度追放してもう一度サーバに追加し直してください'
+        );
+        return;
+    }
     const command = CommandFactory.create(
         parseRes.body.command,
         message,
