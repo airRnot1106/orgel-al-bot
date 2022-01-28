@@ -50,7 +50,7 @@ export class PlaylistCommand extends AbsCommand {
         requestList.some((request) => {
             const { index, title, author, requester_name } = request;
             if (index === 0) {
-                playlistStr += `:headphones:Now: ${title}, Upload by: ${author}, Requested by: ${requester_name}\n`;
+                playlistStr += `:headphones:Now: ${title}, Uploaded by: ${author}, Requested by: ${requester_name}\n`;
             } else {
                 playlistStr += `${index}: ${title}, Upload by: ${author}, Requested by: ${requester_name}\n`;
             }
