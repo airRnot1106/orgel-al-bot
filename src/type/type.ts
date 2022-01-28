@@ -10,7 +10,7 @@ export type Token = {
     readonly DB_URL: string;
 };
 
-export type Commands = 'p' | 's' | 'pn' | 'pl' | 'h';
+export type Commands = 'p' | 's' | 'pn' | 'pl' | 'h' | 'pf';
 
 export type VideoInfo = {
     readonly id: string;

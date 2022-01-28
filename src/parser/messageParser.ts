@@ -11,7 +11,7 @@ export class MessageParser {
     private _database;
     constructor(message: Discord.Message) {
         this._guildId = message.guild?.id;
-        this._commands = ['p', 's', 'pn', 'pl', 'h'];
+        this._commands = ['p', 's', 'pn', 'pl', 'h', 'pf'];
         [this._requestedCommand, ...this._args] = message.content.split(' ');
         this._database = Database.instance;
     }
@@ -105,6 +105,13 @@ export class MessageParser {
                     status: 200,
                     detail: 'Valid command',
                     body: { command: 'h', args: this._args },
+                };
+            }
+            case 'pf': {
+                return <AppResponse<MessageInfo>>{
+                    status: 200,
+                    detail: 'Valid command',
+                    body: { command: 'pf', args: this._args },
                 };
             }
             default:
