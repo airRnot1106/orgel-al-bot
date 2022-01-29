@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const discord_js_1 = __importDefault(require("discord.js"));
 const commandFactory_1 = require("../command/commandFactory");
 const register_1 = require("../database/register");
+const helper_1 = require("../helper/helper");
 const tokenIssuer_1 = require("../issuer/tokenIssuer");
 const messageParser_1 = require("../parser/messageParser");
 const playerFactory_1 = require("../player/playerFactory");
@@ -18,6 +19,12 @@ const client = new discord_js_1.default.Client({
     intents: intents,
 });
 client.on('ready', async () => {
+    const helper = helper_1.Helper.instance;
+    helper.initialize(client);
+    const helperRes = helper.toggleHelpStatus();
+    if (helperRes.status === 403)
+        throw new Error(helperRes.detail);
+    console.log(helperRes.detail);
     console.log("Orgel-Al's screw is wound...");
 });
 client.on('guildCreate', async (guild) => {
