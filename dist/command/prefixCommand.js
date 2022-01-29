@@ -32,6 +32,15 @@ class PrefixCommand extends absCommand_1.AbsCommand {
                 detail: 'Prefix denied',
                 body: { isReply: true, message: '無効なプレフィックスです！' },
             };
+        if (/['"]+/.test(newPrefix))
+            return {
+                status: 400,
+                detail: 'Prefix denied',
+                body: {
+                    isReply: true,
+                    message: 'プレフィックスにクォーテーションを含めることはできません！',
+                },
+            };
         if (/\s\S+/.test(newPrefix))
             return {
                 status: 400,
