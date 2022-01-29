@@ -78,8 +78,11 @@ export class Searcher {
                 status === 200
                     ? {
                           id: res.items[0].id.videoId,
-                          title: res.items[0].snippet.title,
-                          author: res.items[0].snippet.channelTitle,
+                          title: res.items[0].snippet.title.replace("'", "''"),
+                          author: res.items[0].snippet.channelTitle.replace(
+                              "'",
+                              "''"
+                          ),
                           url: `https://www.youtube.com/watch?v=${res.items[0].id.videoId}`,
                       }
                     : null,
