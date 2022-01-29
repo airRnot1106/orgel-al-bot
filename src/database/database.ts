@@ -50,6 +50,7 @@ export class Database {
         if (!this._isValid) {
             throw new Error('No connection to the database');
         }
+        console.log(`ExecutingQuery: ${query}`);
         const result = await this._client.query(query);
         return result;
     }
