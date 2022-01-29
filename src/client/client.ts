@@ -1,6 +1,7 @@
 import Discord from 'discord.js';
 import { CommandFactory } from '../command/commandFactory';
 import { Register } from '../database/register';
+import { Helper } from '../helper/helper';
 import { TokenIssuer } from '../issuer/tokenIssuer';
 import { MessageParser } from '../parser/messageParser';
 import { PlayerFactory } from '../player/playerFactory';
@@ -17,6 +18,11 @@ const client = new Discord.Client({
 });
 
 client.on('ready', async () => {
+    const helper = Helper.instance;
+    helper.initialize(client);
+    const helperRes = helper.toggleHelpStatus();
+    if (helperRes.status === 403) throw new Error(helperRes.detail);
+    console.log(helperRes.detail);
     console.log("Orgel-Al's screw is wound...");
 });
 
