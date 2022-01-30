@@ -53,8 +53,11 @@ export class Searcher {
                 status === 200
                     ? {
                           id: res?.videoDetails.videoId,
-                          title: res?.videoDetails.title,
-                          author: res?.videoDetails.author.name,
+                          title: res?.videoDetails.title.replace("'", "''"),
+                          author: res?.videoDetails.author.name.replace(
+                              "'",
+                              "''"
+                          ),
                           url: videoUrl,
                       }
                     : null,
