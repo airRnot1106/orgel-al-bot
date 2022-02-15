@@ -21,9 +21,8 @@
         "dotenv": "^14.2.0",
         "express": "^4.17.2",
         "pg": "^8.7.1",
-        "tweetnacl": "^1.0.3",
-        "youtube-v3-api": "^1.1.1",
-        "ytdl-core": "^4.10.0"
+        "play-dl": "^1.8.8",
+        "tweetnacl": "^1.0.3"
     },
     "devDependencies": {
         "@types/express": "^4.17.13",
