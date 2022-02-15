@@ -1,6 +1,10 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UrlParser = void 0;
+const play_dl_1 = __importDefault(require("play-dl"));
 class UrlParser {
     static _instance;
     constructor() { }
@@ -14,14 +18,7 @@ class UrlParser {
         return /https?:\/\/[\w!?/+\-_~=;.,*&@#$%()'[\]]+/.test(str);
     }
     isValidUrl(url) {
-        return /https:\/\/www\.youtube\.com\/watch\?v=\S+/.test(url);
-    }
-    isMobileUrl(url) {
-        return /https:\/\/youtu\.be\/\S+/.test(url);
-    }
-    convertMobileUrl(mobileUrl) {
-        const id = mobileUrl.split('youtu.be/')[1];
-        return `https://www.youtube.com/watch?v=${id}`;
+        return play_dl_1.default.yt_validate(url) === 'video';
     }
 }
 exports.UrlParser = UrlParser;

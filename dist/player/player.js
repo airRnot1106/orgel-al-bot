@@ -4,9 +4,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Player = void 0;
+const play_dl_1 = __importDefault(require("play-dl"));
 const voice_1 = require("@discordjs/voice");
 const database_1 = require("../database/database");
-const ytdl_core_1 = __importDefault(require("ytdl-core"));
 const register_1 = require("../database/register");
 class Player {
     _guild;
@@ -46,7 +46,7 @@ class Player {
             await this._database.query(`UPDATE requests SET index = index + 1 WHERE guild_id = '${guildId}'`);
         }
         this._isPlaying = true;
-        await this.play();
+        this.play();
     }
     async play() {
         if (!this._connection)
@@ -70,24 +70,27 @@ class Player {
             requesterId: requesterId,
         };
         await this._register.registerHistory(historyInfo);
-        if (!ytdl_core_1.default.validateURL(url))
-            return;
-        const stream = (0, ytdl_core_1.default)(url, {
-            filter: (format) => format.audioCodec === 'opus' && format.container === 'webm',
-            quality: 'highest',
-            highWaterMark: 32 * 1024 * 1024,
+        const playStream = await play_dl_1.default.stream(url, {
+            discordPlayerCompatibility: true,
         });
-        const resource = (0, voice_1.createAudioResource)(stream, {
-            inputType: voice_1.StreamType.WebmOpus,
+        const resource = (0, voice_1.createAudioResource)(playStream.stream, {
+            inputType: playStream.type,
         });
         const message = `#NowPlaying:notes:\nTitle: ${title}\nBy: ${author}`;
         const textChannel = (await this._guild.channels.fetch(textChannelId));
         if (textChannel)
             textChannel.send(message);
+        playStream.stream.on('error', () => {
+            textChannel?.send(':warning:動画の再生中に問題が発生しました。再生を中断します...');
+            if (this._connection)
+                this._connection.destroy();
+            this._connection = null;
+            this._isPlaying = false;
+        });
         this._player.play(resource);
         await (0, voice_1.entersState)(this._player, voice_1.AudioPlayerStatus.Playing, 10 * 1000);
         await (0, voice_1.entersState)(this._player, voice_1.AudioPlayerStatus.Idle, 24 * 60 * 60 * 1000);
-        await this.prepareNext();
+        this.prepareNext();
     }
     async prepareNext() {
         if (!this._player)
@@ -95,7 +98,7 @@ class Player {
         if (this._player.state.status === voice_1.AudioPlayerStatus.Playing)
             this._player.stop();
         await this._database.query(`DELETE FROM requests WHERE guild_id = '${this._guild.id}' AND index = 0`);
-        await this.play();
+        this.play();
     }
 }
 exports.Player = Player;

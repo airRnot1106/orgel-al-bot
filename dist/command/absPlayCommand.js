@@ -1,10 +1,6 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AbsPlayCommand = void 0;
-const ytdl_core_1 = __importDefault(require("ytdl-core"));
 const searcher_1 = require("../searcher/searcher");
 const absCommand_1 = require("./absCommand");
 const playerFactory_1 = require("../player/playerFactory");
@@ -42,19 +38,14 @@ class AbsPlayCommand extends absCommand_1.AbsCommand {
         const searchRes = await searcher.execute(this._args.join(' '));
         if (searchRes.status === 400 ||
             searchRes.status === 404 ||
+            searchRes.status === 410 ||
             !searchRes.body)
             return {
                 status: searchRes.status,
                 detail: 'Video searching error',
                 body: { isReply: true, message: searchRes.detail },
             };
-        const { id, url } = searchRes.body;
-        if (!ytdl_core_1.default.validateURL(url))
-            return {
-                status: 403,
-                detail: 'Streaming denied',
-                body: { isReply: true, message: 'この動画は再生できません！' },
-            };
+        const { id } = searchRes.body;
         await this._register.registerVideo(searchRes.body);
         const requesterInfo = {
             requesterId: this._executorMessage.author.id,
@@ -92,7 +83,7 @@ class AbsPlayCommand extends absCommand_1.AbsCommand {
     async execute() {
         const beforeRes = await this.before();
         const { status, body } = beforeRes;
-        if (status === 400 || status === 404 || !body)
+        if (status === 400 || status === 404 || status === 410 || !body)
             return beforeRes;
         const { videoInfo, requestInfo } = body;
         await this.process(requestInfo);

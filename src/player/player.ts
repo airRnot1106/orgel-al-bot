@@ -1,4 +1,5 @@
 import Discord from 'discord.js';
+import play from 'play-dl';
 import {
     entersState,
     AudioPlayer,
@@ -6,13 +7,11 @@ import {
     createAudioPlayer,
     createAudioResource,
     joinVoiceChannel,
-    StreamType,
     DiscordGatewayAdapterCreator,
     VoiceConnection,
 } from '@discordjs/voice';
 import { Database } from '../database/database';
 import { HistoryInfo, RequestTable, VideoTable } from '../type/type';
-import ytdl from 'ytdl-core';
 import { Register } from '../database/register';
 
 export class Player {
@@ -65,7 +64,7 @@ export class Player {
             );
         }
         this._isPlaying = true;
-        await this.play();
+        this.play();
     }
 
     async play() {
@@ -110,21 +109,25 @@ export class Player {
             requesterId: requesterId,
         };
         await this._register.registerHistory(historyInfo);
-        if (!ytdl.validateURL(url)) return;
-        const stream = ytdl(url, {
-            filter: (format) =>
-                format.audioCodec === 'opus' && format.container === 'webm',
-            quality: 'highest',
-            highWaterMark: 32 * 1024 * 1024,
+        const playStream = await play.stream(url, {
+            discordPlayerCompatibility: true,
         });
-        const resource = createAudioResource(stream, {
-            inputType: StreamType.WebmOpus,
+        const resource = createAudioResource(playStream.stream, {
+            inputType: playStream.type,
         });
         const message = `#NowPlaying:notes:\nTitle: ${title}\nBy: ${author}`;
         const textChannel = <Discord.TextChannel | null>(
             await this._guild.channels.fetch(textChannelId)
         );
         if (textChannel) textChannel.send(message);
+        playStream.stream.on('error', () => {
+            textChannel?.send(
+                ':warning:動画の再生中に問題が発生しました。再生を中断します...'
+            );
+            if (this._connection) this._connection.destroy();
+            this._connection = null;
+            this._isPlaying = false;
+        });
         this._player.play(resource);
         await entersState(this._player, AudioPlayerStatus.Playing, 10 * 1000);
         await entersState(
@@ -132,7 +135,7 @@ export class Player {
             AudioPlayerStatus.Idle,
             24 * 60 * 60 * 1000
         );
-        await this.prepareNext();
+        this.prepareNext();
     }
 
     async prepareNext() {
@@ -142,6 +145,6 @@ export class Player {
         await this._database.query(
             `DELETE FROM requests WHERE guild_id = '${this._guild.id}' AND index = 0`
         );
-        await this.play();
+        this.play();
     }
 }

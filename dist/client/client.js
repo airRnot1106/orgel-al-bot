@@ -73,7 +73,16 @@ client.on('messageCreate', async (message) => {
         return;
     }
     const command = commandFactory_1.CommandFactory.create(parseRes.body.command, message, parseRes.body.args);
-    const commandRes = await command.execute();
+    const commandRes = await command.execute().catch(() => {
+        return {
+            status: 400,
+            detail: 'An error has occurred',
+            body: {
+                isReply: false,
+                message: 'コマンドの実行中に問題が発生しました。操作をもう一度やり直してください',
+            },
+        };
+    });
     console.log(commandRes);
     if (commandRes.body?.isReply) {
         await message.reply(commandRes.body.message);
@@ -93,3 +102,17 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
     player.disconnect();
 });
 client.login(tokenIssuer_1.TokenIssuer.instance.tokens.DISCORD_BOT_TOKEN);
+process.on('SIGTERM', async () => {
+    const voiceChannels = Array.from(client.channels.cache)
+        .map((arr) => arr[1])
+        .filter((ch) => ch.type === 'GUILD_VOICE');
+    const activeChannels = voiceChannels
+        .filter((ch) => Array.from(ch.members)
+        .map((arr) => arr[1])
+        .some((member) => member.client.user?.id === client.user?.id))
+        .map((ch) => Array.from(ch.guild.channels.cache)
+        .map((arr) => arr[1])
+        .find((ch) => ch.type === 'GUILD_TEXT'))
+        .filter((ch) => !!ch);
+    activeChannels.forEach((ch) => ch.send(':warning:ただいまよりサーバ再起動時間となります。再生中の動画が中断される可能性があります'));
+});

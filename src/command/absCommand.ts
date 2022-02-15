@@ -15,7 +15,5 @@ export abstract class AbsCommand {
         this._register = Register.instance;
     }
 
-    abstract execute():
-        | Promise<AppResponse<CommandInfo>>
-        | AppResponse<CommandInfo>;
+    abstract execute(): Promise<AppResponse<CommandInfo>>;
 }
