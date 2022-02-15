@@ -59,7 +59,7 @@ export class HistoryCommand extends AbsCommand {
             historyStr += `${
                 index + 1
             }: ${title}, Uploaded by: ${author}, Requested by: ${requester_name}\n`;
-            const LENGTH_LIMIT = 1950;
+            const LENGTH_LIMIT = 1800;
             if (historyStr.length > LENGTH_LIMIT) {
                 historyStr += '\nAnd more...\n';
                 return true;
