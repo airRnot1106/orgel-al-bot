@@ -1,17 +1,11 @@
-import ytdl from 'ytdl-core';
-import { YoutubeDataAPI } from 'youtube-v3-api';
-import { TokenIssuer } from '../issuer/tokenIssuer';
+import play from 'play-dl';
 import { UrlParser } from '../parser/urlParser';
 import { AppResponse, VideoInfo } from '../type/type';
 
 export class Searcher {
     private static _instance: Searcher;
-    private readonly _api;
     private readonly _urlParser;
     private constructor() {
-        this._api = new YoutubeDataAPI(
-            TokenIssuer.instance.tokens.YOUTUBE_API_KEY
-        );
         this._urlParser = UrlParser.instance;
     }
 
