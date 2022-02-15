@@ -11,7 +11,6 @@ export class TokenIssuer {
                 ? parseInt(process.env.APP_ENV)
                 : undefined,
             DISCORD_BOT_TOKEN: process.env.DISCORD_BOT_TOKEN,
-            YOUTUBE_API_KEY: process.env.YOUTUBE_API_KEY,
             DB_USER: process.env.DB_USER,
             DB_HOST: process.env.DB_HOST,
             DB_NAME: process.env.DB_NAME,

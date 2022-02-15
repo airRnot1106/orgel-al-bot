@@ -1,3 +1,5 @@
+import play from 'play-dl';
+
 export class UrlParser {
     private static _instance: UrlParser;
     private constructor() {}
@@ -14,15 +16,6 @@ export class UrlParser {
     }
 
     isValidUrl(url: string) {
-        return /https:\/\/www\.youtube\.com\/watch\?v=\S+/.test(url);
-    }
-
-    isMobileUrl(url: string) {
-        return /https:\/\/youtu\.be\/\S+/.test(url);
-    }
-
-    convertMobileUrl(mobileUrl: string) {
-        const id = mobileUrl.split('youtu.be/')[1];
-        return `https://www.youtube.com/watch?v=${id}`;
+        return play.yt_validate(url) === 'video';
     }
 }
