@@ -8,7 +8,7 @@ export class SkipCommand extends AbsCommand {
         super(executorMessage, args);
     }
 
-    execute(): AppResponse<CommandInfo> {
+    async execute(): Promise<AppResponse<CommandInfo>> {
         if (!this._executorMessage.guild)
             return <AppResponse<CommandInfo>>{
                 status: 400,

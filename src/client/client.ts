@@ -5,7 +5,7 @@ import { Helper } from '../helper/helper';
 import { TokenIssuer } from '../issuer/tokenIssuer';
 import { MessageParser } from '../parser/messageParser';
 import { PlayerFactory } from '../player/playerFactory';
-import { GuildInfo } from '../type/type';
+import { AppResponse, CommandInfo, GuildInfo } from '../type/type';
 
 const intents: Discord.IntentsString[] = [
     'GUILDS',
@@ -80,7 +80,17 @@ client.on('messageCreate', async (message) => {
         message,
         parseRes.body.args
     );
-    const commandRes = await command.execute();
+    const commandRes = await command.execute().catch(() => {
+        return <AppResponse<CommandInfo>>{
+            status: 400,
+            detail: 'An error has occurred',
+            body: {
+                isReply: false,
+                message:
+                    'コマンドの実行中に問題が発生しました。操作をもう一度やり直してください',
+            },
+        };
+    });
     console.log(commandRes);
     if (commandRes.body?.isReply) {
         await message.reply(commandRes.body.message);

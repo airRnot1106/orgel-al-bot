@@ -1,4 +1,3 @@
-import ytdl from 'ytdl-core';
 import Discord from 'discord.js';
 import { Searcher } from '../searcher/searcher';
 import {
@@ -52,6 +51,7 @@ export abstract class AbsPlayCommand extends AbsCommand {
         if (
             searchRes.status === 400 ||
             searchRes.status === 404 ||
+            searchRes.status === 410 ||
             !searchRes.body
         )
             return <AppResponse<CommandInfo>>{
@@ -59,13 +59,7 @@ export abstract class AbsPlayCommand extends AbsCommand {
                 detail: 'Video searching error',
                 body: { isReply: true, message: searchRes.detail },
             };
-        const { id, url } = searchRes.body;
-        if (!ytdl.validateURL(url))
-            return <AppResponse<CommandInfo>>{
-                status: 403,
-                detail: 'Streaming denied',
-                body: { isReply: true, message: 'この動画は再生できません！' },
-            };
+        const { id } = searchRes.body;
         await this._register.registerVideo(searchRes.body);
         const requesterInfo: RequesterInfo = {
             requesterId: this._executorMessage.author.id,
@@ -112,7 +106,7 @@ export abstract class AbsPlayCommand extends AbsCommand {
     async execute(): Promise<AppResponse<CommandInfo>> {
         const beforeRes = await this.before();
         const { status, body } = beforeRes;
-        if (status === 400 || status === 404 || !body)
+        if (status === 400 || status === 404 || status === 410 || !body)
             return beforeRes as AppResponse<CommandInfo>;
         const { videoInfo, requestInfo } = body as VideoInfoRequestInfo;
         await this.process(requestInfo);
