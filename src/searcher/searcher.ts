@@ -58,7 +58,7 @@ export class Searcher {
                 if (/While getting info from url/.test(error) || error === 410)
                     return <AppResponse<null>>{
                         status: 410,
-                        detail: 'この動画は再生できません！',
+                        detail: 'この動画は再生できません！\nHint: キーワード検索なら再生できる可能性があります',
                         body: null,
                     };
                 return <AppResponse<null>>{
