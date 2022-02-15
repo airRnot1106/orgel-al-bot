@@ -4,16 +4,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Searcher = void 0;
-const ytdl_core_1 = __importDefault(require("ytdl-core"));
-const youtube_v3_api_1 = require("youtube-v3-api");
-const tokenIssuer_1 = require("../issuer/tokenIssuer");
+const play_dl_1 = __importDefault(require("play-dl"));
 const urlParser_1 = require("../parser/urlParser");
 class Searcher {
     static _instance;
-    _api;
     _urlParser;
     constructor() {
-        this._api = new youtube_v3_api_1.YoutubeDataAPI(tokenIssuer_1.TokenIssuer.instance.tokens.YOUTUBE_API_KEY);
         this._urlParser = urlParser_1.UrlParser.instance;
     }
     static get instance() {
@@ -26,9 +22,7 @@ class Searcher {
         const type = this._urlParser.isUrl(q) ? 'url' : 'keyword';
         switch (type) {
             case 'url': {
-                const url = this._urlParser.isMobileUrl(q)
-                    ? this._urlParser.convertMobileUrl(q)
-                    : q;
+                const url = q;
                 if (!this._urlParser.isValidUrl(url))
                     return {
                         status: 400,
@@ -43,38 +37,74 @@ class Searcher {
         }
     }
     async searchByUrl(videoUrl) {
-        const res = await ytdl_core_1.default.getBasicInfo(videoUrl).catch(() => null);
-        const status = res ? 200 : 404;
-        return {
-            status: status,
-            detail: status === 200 ? '' : '動画が存在しません！',
-            body: status === 200
-                ? {
-                    id: res?.videoDetails.videoId,
-                    title: res?.videoDetails.title.replace("'", "''"),
-                    author: res?.videoDetails.author.name.replace("'", "''"),
-                    url: videoUrl,
-                }
-                : null,
-        };
+        const res = await play_dl_1.default
+            .video_basic_info(videoUrl)
+            .then((res) => {
+            const { id, title, url } = res.video_details;
+            const author = res.video_details.channel?.name;
+            if (!id || !title || !author)
+                throw 410;
+            return {
+                status: 200,
+                detail: '',
+                body: { id: id, title: title, author: author, url: url },
+            };
+        })
+            .catch((error) => {
+            if (/This is not a YouTube Watch URL/.test(error))
+                return {
+                    status: 404,
+                    detail: '動画が存在しません！',
+                    body: null,
+                };
+            if (/While getting info from url/.test(error) || error === 410)
+                return {
+                    status: 410,
+                    detail: 'この動画は再生できません！\nHint: キーワード検索なら再生できる可能性があります',
+                    body: null,
+                };
+            return {
+                status: 500,
+                detail: '不明なエラー',
+                body: null,
+            };
+        });
+        return res;
     }
     async searchByKeyword(videoKeyword) {
-        const res = (await this._api.searchAll(videoKeyword, 3, {
-            type: 'video',
-        }));
-        const status = res.items.length ? 200 : 404;
-        return {
-            status: status,
-            detail: status === 200 ? '' : '動画が存在しません！',
-            body: status === 200
-                ? {
-                    id: res.items[0].id.videoId,
-                    title: res.items[0].snippet.title.replace("'", "''"),
-                    author: res.items[0].snippet.channelTitle.replace("'", "''"),
-                    url: `https://www.youtube.com/watch?v=${res.items[0].id.videoId}`,
-                }
-                : null,
-        };
+        const res = await play_dl_1.default
+            .search(videoKeyword, {
+            source: { youtube: 'video' },
+            limit: 1,
+        })
+            .then((res) => {
+            const target = res[0];
+            if (!target)
+                throw 404;
+            const { id, title, url } = target;
+            const author = target.channel?.name;
+            if (!id || !title || !author)
+                throw 410;
+            return {
+                status: 200,
+                detail: '',
+                body: { id: id, title: title, author: author, url: url },
+            };
+        })
+            .catch((error) => {
+            if (error === 404)
+                return {
+                    status: 404,
+                    detail: '動画が存在しません！',
+                    body: null,
+                };
+            return {
+                status: 410,
+                detail: 'この動画は再生できません！',
+                body: null,
+            };
+        });
+        return res;
     }
 }
 exports.Searcher = Searcher;

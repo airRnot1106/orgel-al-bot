@@ -7,7 +7,7 @@ class SkipCommand extends absCommand_1.AbsCommand {
     constructor(executorMessage, args) {
         super(executorMessage, args);
     }
-    execute() {
+    async execute() {
         if (!this._executorMessage.guild)
             return {
                 status: 400,
