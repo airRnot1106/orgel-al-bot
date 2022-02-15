@@ -109,3 +109,29 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
 });
 
 client.login(TokenIssuer.instance.tokens.DISCORD_BOT_TOKEN);
+
+process.on('SIGTERM', async () => {
+    const voiceChannels = <Discord.VoiceChannel[]>Array.from(
+        client.channels.cache
+    )
+        .map((arr) => arr[1])
+        .filter((ch) => ch.type === 'GUILD_VOICE');
+    const activeChannels = <Discord.TextChannel[]>voiceChannels
+        .filter((ch) =>
+            Array.from(ch.members)
+                .map((arr) => arr[1])
+                .some((member) => member.client.user?.id === client.user?.id)
+        )
+        .map((ch) =>
+            Array.from(ch.guild.channels.cache)
+                .map((arr) => arr[1])
+                .find((ch) => ch.type === 'GUILD_TEXT')
+        )
+        .filter((ch) => !!ch);
+    console.log(activeChannels);
+    activeChannels.forEach((ch) =>
+        ch.send(
+            ':warning:ただいまよりサーバ再起動時間となります。再生中の動画が中断される可能性があります'
+        )
+    );
+});
