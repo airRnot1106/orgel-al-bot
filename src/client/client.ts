@@ -128,7 +128,6 @@ process.on('SIGTERM', async () => {
                 .find((ch) => ch.type === 'GUILD_TEXT')
         )
         .filter((ch) => !!ch);
-    console.log(activeChannels);
     activeChannels.forEach((ch) =>
         ch.send(
             ':warning:ただいまよりサーバ再起動時間となります。再生中の動画が中断される可能性があります'
