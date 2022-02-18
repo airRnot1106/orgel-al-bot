@@ -1,5 +1,6 @@
 import Discord from 'discord.js';
 import { CommandFactory } from '../command/commandFactory';
+import { Database } from '../database/database';
 import { Register } from '../database/register';
 import { Helper } from '../helper/helper';
 import { TokenIssuer } from '../issuer/tokenIssuer';
@@ -116,21 +117,25 @@ process.on('SIGTERM', async () => {
     )
         .map((arr) => arr[1])
         .filter((ch) => ch.type === 'GUILD_VOICE');
-    const activeChannels = <Discord.TextChannel[]>voiceChannels
+    const activeGuilds = voiceChannels
         .filter((ch) =>
             Array.from(ch.members)
                 .map((arr) => arr[1])
                 .some((member) => member.client.user?.id === client.user?.id)
         )
-        .map((ch) =>
-            Array.from(ch.guild.channels.cache)
-                .map((arr) => arr[1])
-                .find((ch) => ch.type === 'GUILD_TEXT')
-        )
-        .filter((ch) => !!ch);
-    activeChannels.forEach((ch) =>
-        ch.send(
+        .map((ch) => ch.guild.id);
+    activeGuilds.forEach(async (guildId) => {
+        const { text_channel_id: textChannelId } =
+            (
+                await Database.instance.query(
+                    `SELECT text_channel_id FROM requests WHERE guild_id = '${guildId}' AND index = 0`
+                )
+            ).rows[0] ?? {};
+        if (!textChannelId) return;
+        const textChannel = await client.channels.fetch(textChannelId);
+        if (!textChannel || !textChannel.isText()) return;
+        textChannel.send(
             ':warning:ただいまよりサーバ再起動時間となります。再生中の動画が中断される可能性があります'
-        )
-    );
+        );
+    });
 });
