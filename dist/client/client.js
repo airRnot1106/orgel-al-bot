@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const discord_js_1 = __importDefault(require("discord.js"));
 const commandFactory_1 = require("../command/commandFactory");
+const database_1 = require("../database/database");
 const register_1 = require("../database/register");
 const helper_1 = require("../helper/helper");
 const tokenIssuer_1 = require("../issuer/tokenIssuer");
@@ -106,13 +107,18 @@ process.on('SIGTERM', async () => {
     const voiceChannels = Array.from(client.channels.cache)
         .map((arr) => arr[1])
         .filter((ch) => ch.type === 'GUILD_VOICE');
-    const activeChannels = voiceChannels
+    const activeGuilds = voiceChannels
         .filter((ch) => Array.from(ch.members)
         .map((arr) => arr[1])
         .some((member) => member.client.user?.id === client.user?.id))
-        .map((ch) => Array.from(ch.guild.channels.cache)
-        .map((arr) => arr[1])
-        .find((ch) => ch.type === 'GUILD_TEXT'))
-        .filter((ch) => !!ch);
-    activeChannels.forEach((ch) => ch.send(':warning:ただいまよりサーバ再起動時間となります。再生中の動画が中断される可能性があります'));
+        .map((ch) => ch.guild.id);
+    activeGuilds.forEach(async (guildId) => {
+        const { text_channel_id: textChannelId } = (await database_1.Database.instance.query(`SELECT text_channel_id FROM requests WHERE guild_id = '${guildId}' AND index = 0`)).rows[0] ?? {};
+        if (!textChannelId)
+            return;
+        const textChannel = await client.channels.fetch(textChannelId);
+        if (!textChannel || !textChannel.isText())
+            return;
+        textChannel.send(':warning:ただいまよりサーバ再起動時間となります。再生中の動画が中断される可能性があります');
+    });
 });
