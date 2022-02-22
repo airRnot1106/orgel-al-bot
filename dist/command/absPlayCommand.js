@@ -98,6 +98,7 @@ class AbsPlayCommand extends absCommand_1.AbsCommand {
                 }
                 message += `${res}\n`;
             }
+            return message;
         })();
         return {
             status: 200,
