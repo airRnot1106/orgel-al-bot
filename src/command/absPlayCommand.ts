@@ -119,6 +119,7 @@ export abstract class AbsPlayCommand extends AbsCommand {
                 }
                 message += `${res}\n`;
             }
+            return message;
         })();
         return <AppResponse<CommandInfo, null>>{
             status: 200,
