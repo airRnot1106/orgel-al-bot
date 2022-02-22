@@ -73,23 +73,32 @@ class Player {
         const playStream = await play_dl_1.default.stream(url, {
             discordPlayerCompatibility: true,
         });
-        const resource = (0, voice_1.createAudioResource)(playStream.stream, {
-            inputType: playStream.type,
-        });
-        const message = `#NowPlaying:notes:\nTitle: ${title}\nBy: ${author}`;
-        const textChannel = (await this._guild.channels.fetch(textChannelId));
-        if (textChannel)
-            textChannel.send(message);
-        playStream.stream.on('error', () => {
-            textChannel?.send(':warning:動画の再生中に問題が発生しました。再生を中断します...');
-            if (this._connection)
-                this._connection.destroy();
-            this._connection = null;
-            this._isPlaying = false;
-        });
-        this._player.play(resource);
-        await (0, voice_1.entersState)(this._player, voice_1.AudioPlayerStatus.Playing, 10 * 1000);
-        await (0, voice_1.entersState)(this._player, voice_1.AudioPlayerStatus.Idle, 24 * 60 * 60 * 1000);
+        try {
+            const resource = (0, voice_1.createAudioResource)(playStream.stream, {
+                inputType: playStream.type,
+            });
+            const message = `#NowPlaying:notes:\nTitle: ${title}\nBy: ${author}`;
+            const textChannel = (await this._guild.channels.fetch(textChannelId));
+            if (textChannel)
+                textChannel.send(message);
+            playStream.stream.on('error', () => {
+                textChannel?.send(':warning:動画の再生中に問題が発生しました。再生を中断します...');
+                if (this._connection)
+                    this._connection.destroy();
+                this._connection = null;
+                this._isPlaying = false;
+            });
+            this._player.play(resource);
+            await (0, voice_1.entersState)(this._player, voice_1.AudioPlayerStatus.Playing, 10 * 1000);
+            await (0, voice_1.entersState)(this._player, voice_1.AudioPlayerStatus.Idle, 24 * 60 * 60 * 1000);
+        }
+        catch {
+            const message = `#NowPlaying:notes:\nTitle: ${title}\nBy: ${author}`;
+            const textChannel = (await this._guild.channels.fetch(textChannelId));
+            if (textChannel)
+                textChannel.send(message);
+            textChannel?.send(':x:再生できない動画がロードされました。再生をスキップします...');
+        }
         this.prepareNext();
     }
     async prepareNext() {
