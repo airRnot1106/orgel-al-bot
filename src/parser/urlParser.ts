@@ -18,4 +18,8 @@ export class UrlParser {
     isValidUrl(url: string) {
         return play.yt_validate(url) === 'video';
     }
+
+    validateType(str: string) {
+        return play.yt_validate(str);
+    }
 }
