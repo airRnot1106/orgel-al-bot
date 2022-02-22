@@ -39,7 +39,7 @@ export class Helper {
 
     toggleHelpStatus() {
         if (!this._client)
-            return <AppResponse<null>>{
+            return <AppResponse<null, null>>{
                 status: 403,
                 detail: 'Not initialized',
                 body: null,
@@ -51,7 +51,7 @@ export class Helper {
             if (this._index >= Object.keys(this._helps).length) this._index = 0;
         }, 5000);
         this._intervalId = intervalId;
-        return <AppResponse<null>>{
+        return <AppResponse<null, null>>{
             status: 200,
             detail: 'Successful setting interval',
             body: null,

@@ -36,36 +36,37 @@ class AbsPlayCommand extends absCommand_1.AbsCommand {
         }
         const searcher = searcher_1.Searcher.instance;
         const searchRes = await searcher.execute(this._args.join(' '));
-        if (searchRes.status === 400 ||
-            searchRes.status === 404 ||
-            searchRes.status === 410 ||
-            !searchRes.body)
+        if (searchRes.status !== 200)
             return {
                 status: searchRes.status,
                 detail: 'Video searching error',
                 body: { isReply: true, message: searchRes.detail },
             };
-        const { id } = searchRes.body;
-        await this._register.registerVideo(searchRes.body);
-        const requesterInfo = {
-            requesterId: this._executorMessage.author.id,
-            requesterName: this._executorMessage.author.username,
-        };
-        await this._register.registerRequester(requesterInfo);
-        const requestInfo = {
-            guildId: this._executorMessage.guild.id,
-            videoId: id,
-            requesterId: this._executorMessage.author.id,
-            textChannelId: this._executorMessage.channel.id,
-        };
-        await this._register.registerGuildVideo(this._executorMessage.guild.id, id);
+        const videoInfoRequestInfo = [];
+        for (const video of searchRes.body) {
+            const { id } = video;
+            await this._register.registerVideo(video);
+            const requesterInfo = {
+                requesterId: this._executorMessage.author.id,
+                requesterName: this._executorMessage.author.username,
+            };
+            await this._register.registerRequester(requesterInfo);
+            const requestInfo = {
+                guildId: this._executorMessage.guild.id,
+                videoId: id,
+                requesterId: this._executorMessage.author.id,
+                textChannelId: this._executorMessage.channel.id,
+            };
+            await this._register.registerGuildVideo(this._executorMessage.guild.id, id);
+            videoInfoRequestInfo.push({
+                videoInfo: video,
+                requestInfo: requestInfo,
+            });
+        }
         return {
             status: 200,
             detail: '',
-            body: {
-                videoInfo: searchRes.body,
-                requestInfo: requestInfo,
-            },
+            body: videoInfoRequestInfo,
         };
     }
     after(videoInfo) {
@@ -74,21 +75,35 @@ class AbsPlayCommand extends absCommand_1.AbsCommand {
         const player = playerFactory_1.PlayerFactory.instance.getPlayer(this._executorMessage.guild);
         player.wind(voiceChannel);
         const { title } = videoInfo;
-        return {
-            status: 200,
-            detail: 'Successful request',
-            body: { isReply: true, message: `Searching:mag_right:: ${title}` },
-        };
+        return `Searching:mag_right:: ${title}`;
     }
     async execute() {
         const beforeRes = await this.before();
         const { status, body } = beforeRes;
-        if (status === 400 || status === 404 || status === 410 || !body)
+        if (status !== 200 || !body)
             return beforeRes;
-        const { videoInfo, requestInfo } = body;
-        await this.process(requestInfo);
-        const appRes = this.after(videoInfo);
-        return appRes;
+        const appRes = [];
+        for (const videoInfoRequestInfo of body) {
+            const { videoInfo, requestInfo } = videoInfoRequestInfo;
+            await this.process(requestInfo);
+            appRes.push(this.after(videoInfo));
+        }
+        const message = (() => {
+            let message = '';
+            const LENGTH_LIMIT = 500;
+            for (const res of appRes) {
+                if (message.length > LENGTH_LIMIT) {
+                    message += 'And more...';
+                    return message;
+                }
+                message += `${res}\n`;
+            }
+        })();
+        return {
+            status: 200,
+            detail: 'Successful request',
+            body: { isReply: true, message: message },
+        };
     }
 }
 exports.AbsPlayCommand = AbsPlayCommand;

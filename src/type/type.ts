@@ -97,8 +97,14 @@ export type HistoryTable = {
     readonly requester_id: string;
 };
 
-export type AppResponse<T> = {
-    readonly status: number;
-    readonly detail: string;
-    readonly body: T | null;
-};
+export type AppResponse<R, E> =
+    | {
+          readonly status: 200 | 204;
+          readonly detail: string;
+          readonly body: R;
+      }
+    | {
+          readonly status: 400 | 403 | 404 | 410 | 500;
+          readonly detail: string;
+          readonly body: E;
+      };

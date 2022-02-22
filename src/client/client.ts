@@ -82,7 +82,7 @@ client.on('messageCreate', async (message) => {
         parseRes.body.args
     );
     const commandRes = await command.execute().catch(() => {
-        return <AppResponse<CommandInfo>>{
+        return <AppResponse<CommandInfo, CommandInfo>>{
             status: 400,
             detail: 'An error has occurred',
             body: {
