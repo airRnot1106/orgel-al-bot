@@ -18,7 +18,7 @@ export class MessageParser {
 
     async execute() {
         if (!this._guildId)
-            return <AppResponse<null>>{
+            return <AppResponse<MessageInfo, null>>{
                 status: 400,
                 detail: 'Not valid guild',
                 body: null,
@@ -43,7 +43,7 @@ export class MessageParser {
                 this._prefix ? this._prefix : '!!'
             )
         )
-            return <AppResponse<null>>{
+            return <AppResponse<null, null>>{
                 status: 400,
                 detail: 'Prefix denied',
                 body: null,
@@ -55,12 +55,12 @@ export class MessageParser {
                 )[1] as Commands
             )
         )
-            return <AppResponse<null>>{
+            return <AppResponse<null, null>>{
                 status: 400,
                 detail: 'Command denied',
                 body: null,
             };
-        return <AppResponse<null>>{
+        return <AppResponse<null, null>>{
             status: 200,
             detail: 'Valid command',
             body: null,
@@ -73,42 +73,42 @@ export class MessageParser {
         )[1];
         switch (command) {
             case 'p': {
-                return <AppResponse<MessageInfo>>{
+                return <AppResponse<MessageInfo, null>>{
                     status: 200,
                     detail: 'Valid command',
                     body: { command: 'p', args: this._args },
                 };
             }
             case 's': {
-                return <AppResponse<MessageInfo>>{
+                return <AppResponse<MessageInfo, null>>{
                     status: 200,
                     detail: 'Valid command',
                     body: { command: 's', args: [] },
                 };
             }
             case 'pn': {
-                return <AppResponse<MessageInfo>>{
+                return <AppResponse<MessageInfo, null>>{
                     status: 200,
                     detail: 'Valid command',
                     body: { command: 'pn', args: this._args },
                 };
             }
             case 'pl': {
-                return <AppResponse<MessageInfo>>{
+                return <AppResponse<MessageInfo, null>>{
                     status: 200,
                     detail: 'Valid command',
                     body: { command: 'pl', args: [] },
                 };
             }
             case 'h': {
-                return <AppResponse<MessageInfo>>{
+                return <AppResponse<MessageInfo, null>>{
                     status: 200,
                     detail: 'Valid command',
                     body: { command: 'h', args: this._args },
                 };
             }
             case 'pf': {
-                return <AppResponse<MessageInfo>>{
+                return <AppResponse<MessageInfo, null>>{
                     status: 200,
                     detail: 'Valid command',
                     body: { command: 'pf', args: this._args },

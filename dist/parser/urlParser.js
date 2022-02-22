@@ -20,5 +20,8 @@ class UrlParser {
     isValidUrl(url) {
         return play_dl_1.default.yt_validate(url) === 'video';
     }
+    validateType(str) {
+        return play_dl_1.default.yt_validate(str);
+    }
 }
 exports.UrlParser = UrlParser;

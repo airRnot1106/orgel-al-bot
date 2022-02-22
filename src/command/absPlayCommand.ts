@@ -18,7 +18,7 @@ export abstract class AbsPlayCommand extends AbsCommand {
 
     protected async before() {
         if (!this._executorMessage.guild)
-            return <AppResponse<CommandInfo>>{
+            return <AppResponse<null, CommandInfo>>{
                 status: 400,
                 detail: 'Not a valid guild',
                 body: { isReply: false, message: '無効なサーバーです！' },
@@ -27,7 +27,7 @@ export abstract class AbsPlayCommand extends AbsCommand {
             this._executorMessage.member?.voice.channel
         );
         if (!voiceChannel)
-            return <AppResponse<CommandInfo>>{
+            return <AppResponse<null, CommandInfo>>{
                 status: 400,
                 detail: 'Not a valid voice channel',
                 body: {
@@ -40,7 +40,7 @@ export abstract class AbsPlayCommand extends AbsCommand {
         );
         if (!this._args.length) {
             player.wind(voiceChannel);
-            return <AppResponse<CommandInfo>>{
+            return <AppResponse<null, null>>{
                 status: 200,
                 detail: 'Successful winding',
                 body: null,
@@ -48,41 +48,40 @@ export abstract class AbsPlayCommand extends AbsCommand {
         }
         const searcher = Searcher.instance;
         const searchRes = await searcher.execute(this._args.join(' '));
-        if (
-            searchRes.status === 400 ||
-            searchRes.status === 404 ||
-            searchRes.status === 410 ||
-            !searchRes.body
-        )
-            return <AppResponse<CommandInfo>>{
+        if (searchRes.status !== 200)
+            return <AppResponse<null, CommandInfo>>{
                 status: searchRes.status,
                 detail: 'Video searching error',
                 body: { isReply: true, message: searchRes.detail },
             };
-        const { id } = searchRes.body;
-        await this._register.registerVideo(searchRes.body);
-        const requesterInfo: RequesterInfo = {
-            requesterId: this._executorMessage.author.id,
-            requesterName: this._executorMessage.author.username,
-        };
-        await this._register.registerRequester(requesterInfo);
-        const requestInfo: RequestInfo = {
-            guildId: this._executorMessage.guild.id,
-            videoId: id,
-            requesterId: this._executorMessage.author.id,
-            textChannelId: this._executorMessage.channel.id,
-        };
-        await this._register.registerGuildVideo(
-            this._executorMessage.guild.id,
-            id
-        );
-        return <AppResponse<VideoInfoRequestInfo>>{
+        const videoInfoRequestInfo: VideoInfoRequestInfo[] = [];
+        for (const video of searchRes.body) {
+            const { id } = video;
+            await this._register.registerVideo(video);
+            const requesterInfo: RequesterInfo = {
+                requesterId: this._executorMessage.author.id,
+                requesterName: this._executorMessage.author.username,
+            };
+            await this._register.registerRequester(requesterInfo);
+            const requestInfo: RequestInfo = {
+                guildId: this._executorMessage.guild.id,
+                videoId: id,
+                requesterId: this._executorMessage.author.id,
+                textChannelId: this._executorMessage.channel.id,
+            };
+            await this._register.registerGuildVideo(
+                this._executorMessage.guild.id,
+                id
+            );
+            videoInfoRequestInfo.push({
+                videoInfo: video,
+                requestInfo: requestInfo,
+            });
+        }
+        return <AppResponse<VideoInfoRequestInfo[], null>>{
             status: 200,
             detail: '',
-            body: {
-                videoInfo: searchRes.body,
-                requestInfo: requestInfo,
-            },
+            body: videoInfoRequestInfo,
         };
     }
 
@@ -96,21 +95,35 @@ export abstract class AbsPlayCommand extends AbsCommand {
         );
         player.wind(voiceChannel);
         const { title } = videoInfo;
-        return <AppResponse<CommandInfo>>{
-            status: 200,
-            detail: 'Successful request',
-            body: { isReply: true, message: `Searching:mag_right:: ${title}` },
-        };
+        return `Searching:mag_right:: ${title}`;
     }
 
-    async execute(): Promise<AppResponse<CommandInfo>> {
+    async execute(): Promise<AppResponse<CommandInfo, null>> {
         const beforeRes = await this.before();
         const { status, body } = beforeRes;
-        if (status === 400 || status === 404 || status === 410 || !body)
-            return beforeRes as AppResponse<CommandInfo>;
-        const { videoInfo, requestInfo } = body as VideoInfoRequestInfo;
-        await this.process(requestInfo);
-        const appRes = this.after(videoInfo);
-        return appRes;
+        if (status !== 200 || !body)
+            return beforeRes as AppResponse<CommandInfo, null>;
+        const appRes = [];
+        for (const videoInfoRequestInfo of body as VideoInfoRequestInfo[]) {
+            const { videoInfo, requestInfo } = videoInfoRequestInfo;
+            await this.process(requestInfo);
+            appRes.push(this.after(videoInfo));
+        }
+        const message = (() => {
+            let message = '';
+            const LENGTH_LIMIT = 500;
+            for (const res of appRes) {
+                if (message.length > LENGTH_LIMIT) {
+                    message += 'And more...';
+                    return message;
+                }
+                message += `${res}\n`;
+            }
+        })();
+        return <AppResponse<CommandInfo, null>>{
+            status: 200,
+            detail: 'Successful request',
+            body: { isReply: true, message: message },
+        };
     }
 }

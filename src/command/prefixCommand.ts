@@ -8,17 +8,17 @@ export class PrefixCommand extends AbsCommand {
         super(executorMessage, args);
     }
 
-    async execute(): Promise<AppResponse<CommandInfo>> {
+    async execute(): Promise<AppResponse<CommandInfo, CommandInfo>> {
         const guild = this._executorMessage.guild;
         if (!guild)
-            return <AppResponse<CommandInfo>>{
+            return {
                 status: 400,
                 detail: 'Not a valid guild',
                 body: { isReply: false, message: '無効なサーバーです！' },
             };
         const hasPermission = guild.me?.permissions.has('CHANGE_NICKNAME');
         if (!hasPermission)
-            return <AppResponse<CommandInfo>>{
+            return {
                 status: 400,
                 detail: 'Permission denied',
                 body: {
@@ -29,13 +29,13 @@ export class PrefixCommand extends AbsCommand {
             };
         const newPrefix = this._args.join(' ');
         if (!newPrefix)
-            return <AppResponse<CommandInfo>>{
+            return {
                 status: 400,
                 detail: 'Prefix denied',
                 body: { isReply: true, message: '無効なプレフィックスです！' },
             };
         if (/['"]+/.test(newPrefix))
-            return <AppResponse<CommandInfo>>{
+            return {
                 status: 400,
                 detail: 'Prefix denied',
                 body: {
@@ -45,7 +45,7 @@ export class PrefixCommand extends AbsCommand {
                 },
             };
         if (/\s\S+/.test(newPrefix))
-            return <AppResponse<CommandInfo>>{
+            return {
                 status: 400,
                 detail: 'Prefix denied',
                 body: {
@@ -54,7 +54,7 @@ export class PrefixCommand extends AbsCommand {
                 },
             };
         if (newPrefix.length > 5)
-            return <AppResponse<CommandInfo>>{
+            return {
                 status: 400,
                 detail: 'Too long prefix',
                 body: {
@@ -67,7 +67,7 @@ export class PrefixCommand extends AbsCommand {
             ? 'Orgel-Al'
             : 'Orgel-Al-dev';
         await guild.me?.setNickname(`[${newPrefix}]${BOT_NAME}`);
-        return <AppResponse<CommandInfo>>{
+        return {
             status: 200,
             detail: 'Successful register prefix',
             body: {
