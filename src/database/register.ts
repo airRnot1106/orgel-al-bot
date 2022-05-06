@@ -1,10 +1,4 @@
-import {
-    GuildInfo,
-    RequesterInfo,
-    VideoInfo,
-    RequestInfo,
-    HistoryInfo,
-} from '../type/type';
+import { GuildInfo, HistoryInfo, RequesterInfo, RequestInfo, VideoInfo } from '../type/type';
 import { Database } from './database';
 
 export class Register {
@@ -34,7 +28,10 @@ export class Register {
             await this.deleteGuild(guildId);
         }
         await this._database.query(
-            `INSERT INTO guilds (guild_id, guild_name, owner_id, owner_name) VALUES ('${guildId}', '${guildName}', '${ownerId}', '${ownerName}')`
+            `INSERT INTO guilds (guild_id, guild_name, owner_id, owner_name) VALUES ('${guildId}', '${guildName.replaceAll(
+                "'",
+                "''"
+            )}', '${ownerId}', '${ownerName.replaceAll("'", "''")}')`
         );
     }
 
@@ -65,7 +62,10 @@ export class Register {
             );
         } else {
             await this._database.query(
-                `INSERT INTO videos (video_id, title, author, url) VALUES ('${id}', '${title}', '${author}', '${url}')`
+                `INSERT INTO videos (video_id, title, author, url) VALUES ('${id}', '${title.replaceAll(
+                    "'",
+                    "''"
+                )}', '${author.replaceAll("'", "''")}', '${url}')`
             );
         }
     }
@@ -135,7 +135,10 @@ export class Register {
             );
         } else {
             await this._database.query(
-                `INSERT INTO requesters (requester_id, requester_name) VALUES ('${requesterId}', '${requesterName}')`
+                `INSERT INTO requesters (requester_id, requester_name) VALUES ('${requesterId}', '${requesterName.replaceAll(
+                    "'",
+                    "''"
+                )}')`
             );
         }
     }
