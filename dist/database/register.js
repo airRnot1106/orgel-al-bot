@@ -20,7 +20,7 @@ class Register {
         if (isExists) {
             await this.deleteGuild(guildId);
         }
-        await this._database.query(`INSERT INTO guilds (guild_id, guild_name, owner_id, owner_name) VALUES ('${guildId}', '${guildName}', '${ownerId}', '${ownerName}')`);
+        await this._database.query(`INSERT INTO guilds (guild_id, guild_name, owner_id, owner_name) VALUES ('${guildId}', '${guildName.replaceAll("'", "''")}', '${ownerId}', '${ownerName.replaceAll("'", "''")}')`);
     }
     async deleteGuild(guildId) {
         await this._database.query(`DELETE FROM guilds WHERE guild_id = '${guildId}'`);
@@ -35,7 +35,7 @@ class Register {
             await this._database.query(`UPDATE videos SET requested_times = requested_times + 1 WHERE video_id = '${id}'`);
         }
         else {
-            await this._database.query(`INSERT INTO videos (video_id, title, author, url) VALUES ('${id}', '${title}', '${author}', '${url}')`);
+            await this._database.query(`INSERT INTO videos (video_id, title, author, url) VALUES ('${id}', '${title.replaceAll("'", "''")}', '${author.replaceAll("'", "''")}', '${url}')`);
         }
     }
     async registerGuildVideo(guildId, videoId) {
@@ -67,7 +67,7 @@ class Register {
             await this._database.query(`UPDATE requesters SET request_times = request_times + 1 WHERE requester_id = '${requesterId}'`);
         }
         else {
-            await this._database.query(`INSERT INTO requesters (requester_id, requester_name) VALUES ('${requesterId}', '${requesterName}')`);
+            await this._database.query(`INSERT INTO requesters (requester_id, requester_name) VALUES ('${requesterId}', '${requesterName.replaceAll("'", "''")}')`);
         }
     }
     async registerHistory(history) {
